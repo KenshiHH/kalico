@@ -4,19 +4,25 @@
 # Copyright (C) 2016-2020  Kevin O'Connor <kevin@koconnor.net>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
-import os, logging, ast, configparser
+import logging, ast, configparser
+import pathlib
 from klippy.gcode import CommandError
 
 
 class SaveVariables:
     def __init__(self, config):
         self.printer = config.get_printer()
-        self.filename = os.path.expanduser(config.get("filename"))
+        self.filename = pathlib.Path(
+            config.get(
+                "filename", self.printer.get_user_path() / "user_variables.cfg"
+            )
+        ).expanduser()
         self.allVariables = {}
         try:
-            if not os.path.exists(self.filename):
-                open(self.filename, "w").close()
-            self.load_variables()
+            if self.filename.exists():
+                self.load_variables()
+            else:
+                self.allVariables = {}
         except self.printer.command_error as e:
             raise config.error(str(e))
         gcode = self.printer.lookup_object("gcode")

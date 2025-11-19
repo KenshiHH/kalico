@@ -5,6 +5,7 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 
 import sys, os, gc, optparse, logging, time, collections, importlib, importlib.util
+import pathlib
 
 from . import compat
 from . import util, reactor, queuelogger, msgproto
@@ -82,6 +83,9 @@ class Printer:
 
     def get_start_args(self):
         return self.start_args
+
+    def get_user_path(self):
+        return pathlib.Path(self.start_args["config_file"]).expanduser().parent
 
     def get_reactor(self):
         return self.reactor
@@ -196,7 +200,6 @@ class Printer:
         self.objects["configfile"] = pconfig = configfile.PrinterConfig(self)
         config = pconfig.read_main_config()
         self.load_object(config, "danger_options", None)
-        self.load_object(config, "kalico_api", None)
         if (
             self.bglogger is not None
             and get_danger_options().log_config_file_at_startup
@@ -205,13 +208,15 @@ class Printer:
         # Create printer components
         for m in [pins, mcu]:
             m.add_printer_objects(config)
+        self.load_object(config, "kalico_api")
         for section_config in config.get_prefix_sections(""):
             self.load_object(config, section_config.get_name(), None)
         # Kalico on-by-default extras
         for section_config in [
+            "save_variables",
+            "exclude_object",
             "force_move",
             "respond",
-            "exclude_object",
             "telemetry",
         ]:
             self.load_object(config, section_config, None)
