@@ -5,9 +5,9 @@ import typing
 from klippy.gcode import CommandError
 
 if typing.TYPE_CHECKING:
+    from klippy.configfile import ConfigWrapper
     from klippy.extras.save_variables import SaveVariables
     from klippy.printer import Printer
-    from klippy.configfile import ConfigWrapper
 
 
 class SaveVariablesWrapper:

@@ -16,11 +16,11 @@ from .heaters import HeatersAPI
 from .save_variables import SaveVariablesWrapper
 
 if typing.TYPE_CHECKING:
+    from klippy.configfile import ConfigWrapper
     from klippy.extras.gcode_macro import GCodeMacro
     from klippy.gcode import GCodeDispatch
     from klippy.printer import Printer
     from klippy.reactor import SelectReactor
-    from klippy.configfile import ConfigWrapper
 
 BlockingResult = typing.TypeVar("BlockingResult")
 
